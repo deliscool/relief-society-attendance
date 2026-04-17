@@ -75,9 +75,19 @@ function handleGetConfig() {
 
   for (var i = 0; i < data.length; i++) {
     var name = String(data[i][0]).trim();
-    var date = String(data[i][2]).trim();
-    if (name) names.push(name);
-    if (date && date !== "undefined") dates.push(date);
+    if (name && name !== "undefined") names.push(name);
+
+    var dateVal = data[i][2];
+    if (dateVal !== "" && dateVal !== null && dateVal !== undefined) {
+      var dateStr;
+      if (dateVal instanceof Date) {
+        // Google Sheets stores dates as Date objects — format to YYYY-MM-DD
+        dateStr = Utilities.formatDate(dateVal, Session.getScriptTimeZone(), "yyyy-MM-dd");
+      } else {
+        dateStr = String(dateVal).trim();
+      }
+      if (dateStr && dateStr !== "undefined") dates.push(dateStr);
+    }
   }
 
   return { names: names, dates: dates };

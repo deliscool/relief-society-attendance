@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isValid } from "date-fns";
+
+function safeFormat(dateStr: string, fmt: string, fallback = dateStr): string {
+  try {
+    const d = parseISO(dateStr);
+    return isValid(d) ? format(d, fmt) : fallback;
+  } catch {
+    return fallback;
+  }
+}
 import { CheckCircle2, Search, Loader2, CalendarDays, UserCheck, Send } from "lucide-react";
 import { getConfig, submitAttendance, type Config } from "../lib/api";
 
@@ -190,42 +199,47 @@ export default function AttendancePage() {
             </p>
 
             {/* Date list */}
-            <div className="space-y-3 mb-6">
-              {(config?.dates ?? []).sort().map((date) => {
-                const parsed = parseISO(date);
-                const checked = selectedDates.includes(date);
-                return (
-                  <button
-                    key={date}
-                    onClick={() => toggleDate(date)}
-                    className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl border-2 transition-all text-left ${
-                      checked
-                        ? "border-navy bg-navy text-white shadow-lg"
-                        : "border-navy/20 bg-white text-navy hover:border-navy/40 hover:bg-navy/3"
-                    }`}
-                    style={{ minHeight: 64 }}
-                  >
-                    {/* Checkbox visual */}
-                    <div className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all ${
-                      checked ? "bg-gold border-gold" : "border-navy/30 bg-white"
-                    }`}>
-                      {checked && <CheckCircle2 className="w-5 h-5 text-white" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-base leading-tight">
-                        {format(parsed, "EEEE, MMMM d")}
-                      </p>
-                      <p className={`text-sm mt-0.5 ${checked ? "text-blue-200" : "text-gray-400"}`}>
-                        {format(parsed, "yyyy")}
-                      </p>
-                    </div>
-                    {checked && (
-                      <span className="text-gold font-bold text-sm shrink-0">✓ Selected</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+            {(config?.dates ?? []).length === 0 ? (
+              <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 px-6 py-8 text-center mb-6">
+                <p className="text-amber-800 font-semibold text-base mb-1">No dates available yet.</p>
+                <p className="text-amber-700 text-sm">Please ask your admin to add upcoming Sundays.</p>
+              </div>
+            ) : (
+              <div className="space-y-3 mb-6">
+                {(config?.dates ?? []).sort().map((date) => {
+                  const checked = selectedDates.includes(date);
+                  return (
+                    <button
+                      key={date}
+                      onClick={() => toggleDate(date)}
+                      className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl border-2 transition-all text-left ${
+                        checked
+                          ? "border-navy bg-navy text-white shadow-lg"
+                          : "border-navy/20 bg-white text-navy hover:border-navy/40"
+                      }`}
+                      style={{ minHeight: 64 }}
+                    >
+                      <div className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all ${
+                        checked ? "bg-gold border-gold" : "border-navy/30 bg-white"
+                      }`}>
+                        {checked && <CheckCircle2 className="w-5 h-5 text-white" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-base leading-tight">
+                          {safeFormat(date, "EEEE, MMMM d")}
+                        </p>
+                        <p className={`text-sm mt-0.5 ${checked ? "text-blue-200" : "text-gray-400"}`}>
+                          {safeFormat(date, "yyyy")}
+                        </p>
+                      </div>
+                      {checked && (
+                        <span className="text-gold font-bold text-sm shrink-0">✓ Selected</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
             {selectedDates.length > 0 && (
               <div className="bg-gold/10 border border-gold/30 rounded-xl px-4 py-3 text-center mb-4">
@@ -286,7 +300,7 @@ export default function AttendancePage() {
               <div className="flex flex-wrap gap-2">
                 {selectedDates.sort().map((d) => (
                   <span key={d} className="px-3 py-1.5 bg-navy text-white text-sm font-semibold rounded-lg">
-                    {format(parseISO(d), "MMM d, yyyy")}
+                    {safeFormat(d, "MMM d, yyyy")}
                   </span>
                 ))}
               </div>
