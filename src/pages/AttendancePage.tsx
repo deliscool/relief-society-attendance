@@ -95,7 +95,7 @@ export default function AttendancePage() {
           Relief Society
         </h1>
         <p className="text-blue-200 text-sm font-sans">
-          Santaquin Ward · Attendance Roll
+          Foothills Ward · 2026 Attendance Roll
         </p>
       </header>
 
