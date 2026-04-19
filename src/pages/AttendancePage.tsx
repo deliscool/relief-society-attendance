@@ -3,10 +3,11 @@ import { format, parseISO, isValid, isSameMonth, isSameYear } from "date-fns";
 import { CheckCircle2, Search, Loader2, CalendarDays, UserCheck, Send, ChevronDown, ChevronUp, History } from "lucide-react";
 import { getConfig, submitAttendance, getMyAttendance, type Config } from "../lib/api";
 
-// Safe date formatter — never crashes on bad date strings
+// Safe date formatter — handles both YYYY-MM-DD and full Date strings
 function safeFormat(dateStr: string, fmt: string, fallback = dateStr): string {
   try {
-    const d = parseISO(dateStr);
+    let d = parseISO(dateStr);
+    if (!isValid(d)) d = new Date(dateStr);
     return isValid(d) ? format(d, fmt) : fallback;
   } catch {
     return fallback;
