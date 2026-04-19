@@ -49,6 +49,8 @@ function doGet(e) {
       result = handleRemoveDate(e.parameter);
     } else if (action === "getSubmissions") {
       result = handleGetSubmissions(e.parameter);
+    } else if (action === "getMyAttendance") {
+      result = handleGetMyAttendance(e.parameter);
     } else if (action === "verifyPin") {
       result = handleVerifyPin(e.parameter);
     } else {
@@ -207,6 +209,35 @@ function handleGetSubmissions(params) {
   }
   // Return most recent first
   return rows.reverse();
+}
+
+// ─── Attendance by Member ──────────────────────
+
+function handleGetMyAttendance(params) {
+  var name = (params.name || "").trim();
+  if (!name) return { dates: [] };
+
+  var sheet = getSheet("Responses");
+  if (!sheet) return { dates: [] };
+
+  var data = sheet.getDataRange().getValues();
+  var allDates = [];
+
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][1]).trim() === name) {
+      var dateStr = String(data[i][2]).trim();
+      if (dateStr) {
+        dateStr.split(",").forEach(function(d) {
+          var trimmed = d.trim();
+          if (trimmed && allDates.indexOf(trimmed) === -1) {
+            allDates.push(trimmed);
+          }
+        });
+      }
+    }
+  }
+
+  return { dates: allDates.sort() };
 }
 
 // ─── PIN Verify ────────────────────────────────

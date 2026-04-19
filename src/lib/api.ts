@@ -56,6 +56,11 @@ export async function getSubmissions(pin: string): Promise<Submission[]> {
   return data as Submission[];
 }
 
+export async function getMyAttendance(name: string): Promise<string[]> {
+  const data = await call({ action: "getMyAttendance", name }) as { dates: string[] };
+  return data.dates ?? [];
+}
+
 export async function verifyPin(pin: string): Promise<boolean> {
   try {
     const data = await call({ action: "verifyPin", pin }) as { valid: boolean };
