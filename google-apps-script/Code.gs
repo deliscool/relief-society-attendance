@@ -201,8 +201,15 @@ function handleGetSubmissions(params) {
   var rows = [];
   // Skip header row
   for (var i = 1; i < data.length; i++) {
+    var tsVal = data[i][0];
+    var tsStr;
+    if (tsVal instanceof Date) {
+      tsStr = tsVal.toISOString();
+    } else {
+      tsStr = String(tsVal);
+    }
     rows.push({
-      timestamp: String(data[i][0]),
+      timestamp: tsStr,
       name: String(data[i][1]),
       dates: String(data[i][2]),
     });

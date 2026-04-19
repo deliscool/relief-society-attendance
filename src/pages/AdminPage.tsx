@@ -363,7 +363,17 @@ export default function AdminPage() {
                     <div key={i} className="rounded-2xl border-2 border-navy/15 px-5 py-4">
                       <p className="font-serif font-bold text-navy text-lg leading-tight">{s.name}</p>
                       <p className="text-gray-400 text-sm font-sans mt-0.5 mb-3">
-                        {(() => { try { return format(new Date(s.timestamp), "MMM d, yyyy 'at' h:mm a"); } catch { return s.timestamp; } })()}
+                        {(() => {
+                          try {
+                            const d = new Date(s.timestamp);
+                            if (isNaN(d.getTime())) return "Date unavailable";
+                            return new Intl.DateTimeFormat("en-US", {
+                              timeZone: "America/Denver",
+                              month: "long", day: "numeric", year: "numeric",
+                              hour: "numeric", minute: "2-digit",
+                            }).format(d);
+                          } catch { return "Date unavailable"; }
+                        })()}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {s.dates.split(",").map((d) => (
