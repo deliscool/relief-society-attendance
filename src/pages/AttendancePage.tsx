@@ -50,12 +50,13 @@ export default function AttendancePage() {
   // Split dates into current month vs other months
   const now = new Date();
   const allDates = (config?.dates ?? []).sort();
+  const parseDate = (d: string) => { const p = parseISO(d); return isValid(p) ? p : new Date(d); };
   const thisMonthDates = allDates.filter((d) => {
-    try { return isSameMonth(parseISO(d), now) && isSameYear(parseISO(d), now); }
+    try { const p = parseDate(d); return isValid(p) && isSameMonth(p, now) && isSameYear(p, now); }
     catch { return false; }
   });
   const otherDates = allDates.filter((d) => {
-    try { return !(isSameMonth(parseISO(d), now) && isSameYear(parseISO(d), now)); }
+    try { const p = parseDate(d); return !isValid(p) || !(isSameMonth(p, now) && isSameYear(p, now)); }
     catch { return false; }
   });
   const visibleDates = showAllMonths ? allDates : (thisMonthDates.length > 0 ? thisMonthDates : allDates);
