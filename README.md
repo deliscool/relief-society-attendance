@@ -48,3 +48,5 @@ export default tseslint.config({
   },
 })
 ```
+
+deployed https://main.d28fo99xo1vghm.amplifyapp.com/
